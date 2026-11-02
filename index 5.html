@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shajara — oilamiz avlodlari daraxti</title>
+<meta name="description" content="Oilamiz shajarasi: ajdodlardan bugungi avlodgacha.">
+<style>
+:root{
+  --bg:#f1f4ec;--card:#fbfcf8;--ink:#1d2a1e;--muted:#566657;
+  --leaf:#cfe3b8;--bark:#6d4c32;--bark-ink:#fff8ee;--line:#8a6a4b;--accent:#3e7a3a;--hl:#f2c94c;
+  --serif:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#101712;--card:#18231a;--ink:#e6efe2;--muted:#9db39f;--leaf:#2f4a2c;--bark:#8a6a46;--line:#8a6a46;--accent:#8fd08a;--hl:#8a6a12}
+}
+:root[data-theme="dark"]{--bg:#101712;--card:#18231a;--ink:#e6efe2;--muted:#9db39f;--leaf:#2f4a2c;--bark:#8a6a46;--line:#8a6a46;--accent:#8fd08a;--hl:#8a6a12}
+html{color-scheme:light dark;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.6 var(--sans)}
+main{max-width:1100px;margin:0 auto;padding:2.5rem 1.25rem 3rem}
+h1{font:700 clamp(3.2rem,14vw,5.6rem)/1 var(--serif);letter-spacing:-.02em;margin:0 0 .6rem}
+.lead{font:1.25rem/1.5 var(--serif);margin:0 0 .5rem;max-width:34rem}
+.stats{margin:0;font-weight:600;color:var(--accent)}
+
+.tools{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:1.75rem 0 .5rem}
+.tools input{flex:1 1 14rem;min-width:0;padding:.65rem .9rem;border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
+.tools button,.sheet .head button{padding:.6rem .9rem;border:1.5px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);font:inherit;cursor:pointer}
+.tools button:hover,.sheet .head button:hover{border-color:var(--accent)}
+.hint,#count{margin:0;color:var(--muted);font-size:.9rem}
+#count{min-height:1.4em}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.family{overflow-x:auto;padding:1rem .5rem 1.25rem;border-top:1px dashed var(--line)}
+.tree{width:max-content;margin:0 auto}
+.tree ul{display:flex;justify-content:center;list-style:none;margin:0;padding:18px 0 0;position:relative}
+.tree>ul{padding-top:0}
+.tree li{position:relative;display:flex;flex-direction:column;align-items:center;padding:18px 6px 0}
+.tree>ul>li{padding-top:0}
+.tree li::before,.tree li::after{content:"";position:absolute;top:0;right:50%;width:50%;height:18px;border-top:2px solid var(--line)}
+.tree li::after{right:auto;left:50%;border-left:2px solid var(--line)}
+.tree li:first-child::before,.tree li:last-child::after{border:0 none}
+.tree li:last-child::before{border-right:2px solid var(--line);border-radius:0 8px 0 0}
+.tree li:first-child::after{border-radius:8px 0 0 0}
+.tree li:only-child{padding-top:0}
+.tree li:only-child::before,.tree li:only-child::after{display:none}
+.tree ul ul::before{content:"";position:absolute;top:0;left:50%;height:18px;border-left:2px solid var(--line)}
+
+.node{display:flex;flex-direction:column;align-items:center;min-width:84px;max-width:120px;padding:.5rem .75rem;border:2px solid transparent;border-radius:4px 22px 4px 22px;background:var(--leaf);color:var(--ink);font:inherit;line-height:1.2;cursor:pointer}
+.node span{font:700 .95rem/1.2 var(--serif)}
+.node small{font-size:.75rem;opacity:.75;margin-top:.15rem}
+.tree>ul>li>.node{background:var(--bark);color:var(--bark-ink);border-radius:6px 26px 6px 26px;padding:.65rem 1rem}
+.node:hover{border-color:var(--accent)}
+.node.sel{border-color:var(--ink);box-shadow:0 0 0 3px var(--hl)}
+.node.hit{background:var(--hl);color:var(--ink)}
+
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--card);border-top:3px solid var(--bark);padding:1rem 1.25rem calc(1rem + env(safe-area-inset-bottom,0px))}
+.sheet .inner{max-width:760px;margin:0 auto}
+.sheet .head{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.sheet h2{font:700 1.5rem/1.2 var(--serif);margin:0}
+.sheet p{margin:.35rem 0 0}
+.sheet .meta{color:var(--muted);font-size:.9rem}
+.sheet .rel button{margin:.2rem .35rem .2rem 0;padding:.15rem .7rem;border:1.5px solid var(--accent);border-radius:999px;background:transparent;color:var(--accent);font:inherit;font-size:.9rem;cursor:pointer}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .2s ease-out}@keyframes up{from{transform:translateY(20px);opacity:0}}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Shajara</h1>
+    <p class="lead">Oilamiz avlodlari daraxti: ajdodlardan bugungi kunlargacha.</p>
+    <p class="stats" id="stats"></p>
+  </header>
+  <div class="tools">
+    <input id="q" type="search" placeholder="Ism bo‘yicha qidirish" aria-label="Ism bo‘yicha qidirish" autocomplete="off">
+    <button type="button" id="zout" aria-label="Kichraytirish">−</button>
+    <button type="button" id="zin" aria-label="Kattalashtirish">+</button>
+    <p id="count" aria-live="polite"></p>
+  </div>
+  <p class="hint">Ism ustiga bosing, ma’lumoti pastda chiqadi. Daraxtni yon tomonga surib ko‘rishingiz mumkin.</p>
+  <div id="forest"></div>
+</main>
+<aside class="sheet" id="sheet" hidden aria-live="polite"></aside>
+
+<script>
+/* MA’LUMOTLAR: shu ro‘yxatni tahrirlab, yangi a’zo qo‘shishingiz mumkin.
+   id — noyob raqam, parent — ota yoki onaning id si (eng birinchi ajdod uchun null),
+   spouse — juftlari (ixtiyoriy), note — izoh (ixtiyoriy). */
+const FAMILY=[
+  {id:1,name:"Oʻrog buva",born:1900,died:1948,parent:null},
+  {id:2,name:"Qizlarhon",parent:1},
+  {id:3,name:"Toji",parent:1},
+  {id:4,name:"Qorasoch",parent:1},
+  {id:5,name:"Rashid buva",born:1927,died:2013,spouse:"Ruhsat momo",parent:1},
+  {id:6,name:"Abdumajid",born:1958,parent:5},
+  {id:7,name:"Gulnihol",born:1962,parent:5},
+  {id:8,name:"Erkin",born:1964,parent:5},
+  {id:9,name:"Farhod",born:1967,spouse:"Yulduz",parent:5},
+  {id:10,name:"Toʻra",born:1969,parent:5},
+  {id:11,name:"Farmon",born:1972,parent:5},
+  {id:12,name:"Javohir",parent:9},
+  {id:13,name:"Jahongir",parent:9},
+  {id:14,name:"Diyora",parent:9},
+  {id:15,name:"Sabr buva",years:"1892",note:"Daftarda 10-yanvar sanasi ko‘rsatilgan.",parent:null},
+  {id:16,name:"Rayim buva",parent:null},
+  {id:17,name:"Beknazar buva",spouse:"Saida momo (1936–1973), Tojigul",parent:null},
+  {id:18,name:"Horiyat",parent:17},
+  {id:19,name:"Sulton",parent:17},
+  {id:20,name:"Rustam",parent:17}
+];
+
+const map=new Map(FAMILY.map(p=>[p.id,{...p,kids:[]}]));
+const roots=[];
+map.forEach(p=>{const par=map.get(p.parent);par?par.kids.push(p):roots.push(p)});
+let maxGen=1;
+(function gen(list,n){list.forEach(p=>{maxGen=Math.max(maxGen,n);gen(p.kids,n+1)})})(roots,1);
+const yrs=p=>p.years||(p.born?p.born+"–"+(p.died||""):"");
+const calm=()=>matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+const forest=document.getElementById("forest"),sheet=document.getElementById("sheet");
+document.getElementById("stats").textContent=FAMILY.length+" nafar a’zo, "+maxGen+" avlod";
+
+function branch(items){
+  const ul=document.createElement("ul");
+  items.forEach(p=>{
+    const li=document.createElement("li");
+    const b=document.createElement("button");
+    b.type="button";b.className="node";b.dataset.id=p.id;
+    const n=document.createElement("span");n.textContent=p.name;b.append(n);
+    if(yrs(p)){const y=document.createElement("small");y.textContent=yrs(p);b.append(y);}
+    b.onclick=()=>show(p);
+    li.append(b);
+    if(p.kids.length)li.append(branch(p.kids));
+    ul.append(li);
+  });
+  return ul;
+}
+roots.forEach(r=>{
+  const fam=document.createElement("div");fam.className="family";
+  const tree=document.createElement("div");tree.className="tree";
+  tree.append(branch([r]));fam.append(tree);forest.append(fam);
+});
+
+function mark(id){
+  forest.querySelectorAll(".node.sel").forEach(e=>e.classList.remove("sel"));
+  const b=forest.querySelector('.node[data-id="'+id+'"]');
+  if(b)b.classList.add("sel");
+  return b;
+}
+function closeSheet(){
+  mark(-1);sheet.hidden=true;document.body.style.paddingBottom="";
+}
+function link(id){
+  const b=document.createElement("button");
+  b.type="button";b.textContent=map.get(id).name;b.onclick=()=>pick(id);return b;
+}
+function show(p){
+  const b=mark(p.id);
+  sheet.replaceChildren();
+  const inner=document.createElement("div");inner.className="inner";
+  const head=document.createElement("div");head.className="head";
+  const h=document.createElement("h2");h.textContent=p.name;
+  const x=document.createElement("button");x.type="button";x.textContent="Yopish";x.onclick=closeSheet;
+  head.append(h,x);inner.append(head);
+  const line=(t,cls)=>{const e=document.createElement("p");if(cls)e.className=cls;e.textContent=t;inner.append(e);return e;};
+  const meta=[yrs(p),p.place].filter(Boolean).join(", ");
+  if(meta)line(meta,"meta");
+  if(p.spouse)line("Juftlari: "+p.spouse);
+  if(p.note)line(p.note);
+  const par=map.get(p.parent);
+  if(par)line("Ota-onasi: ","rel").append(link(par.id));
+  if(p.kids.length){const r=line("Farzandlari: ","rel");p.kids.forEach(k=>r.append(link(k.id)));}
+  sheet.append(inner);sheet.hidden=false;
+  document.body.style.paddingBottom=sheet.offsetHeight+16+"px";
+  return b;
+}
+function pick(id){
+  const b=show(map.get(id));
+  if(b)b.scrollIntoView({block:"nearest",inline:"center",behavior:calm()?"auto":"smooth"});
+}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet();});
+
+let z=1;
+const setZ=v=>{z=Math.min(1.5,Math.max(.55,v));forest.style.zoom=z;};
+document.getElementById("zin").onclick=()=>setZ(z+.15);
+document.getElementById("zout").onclick=()=>setZ(z-.15);
+if(innerWidth<520)setZ(.85);
+
+const q=document.getElementById("q"),count=document.getElementById("count");
+q.addEventListener("input",()=>{
+  const v=q.value.trim().toLowerCase();let c=0,first=null;
+  forest.querySelectorAll(".node").forEach(b=>{
+    const hit=!!v&&b.firstChild.textContent.toLowerCase().includes(v);
+    b.classList.toggle("hit",hit);
+    if(hit){c++;first=first||b;}
+  });
+  count.textContent=v?(c?c+" ta topildi":"Hech kim topilmadi"):"";
+  if(first)first.scrollIntoView({block:"center",inline:"center",behavior:calm()?"auto":"smooth"});
+});
+</script>
+</body>
+</html>
